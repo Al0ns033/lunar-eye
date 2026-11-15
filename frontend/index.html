@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lunar Eye — Mission Planner</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/home.css">
+  <script type="importmap">
+    { "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/",
+      "chart.js/auto": "https://cdn.jsdelivr.net/npm/chart.js@4.4.4/auto/+esm"
+    } }
+  </script>
+</head>
+<body class="home-active">
+  <div id="loading" hidden><div class="ld-inner"><div class="ld-orbit"><span></span></div><h2>Lunar Eye</h2><p class="ld-subtitle">Mission Planner</p><p id="ld-msg"><span data-i18n="Caricamento texture e dati…">Loading textures and data…</span></p></div></div>
+
+
+  <main id="home" aria-labelledby="home-title">
+    <header class="home-header">
+      <a class="home-wordmark" href="./">Lunar Eye <span>Mission Planner</span>
+      </a>
+      <div class="language-switch" role="group" data-i18n-label="Lingua" aria-label="Language">
+      <button type="button" data-language="it" lang="it" aria-label="Italiano" aria-pressed="false">IT</button>
+      <button type="button" data-language="en" lang="en" aria-label="English" aria-pressed="true">EN</button>
+      </div>
+    </header>
+    <section class="home-hero">
+      <div class="home-intro">
+      <p data-i18n="La prossima missione comincia da qui." class="home-eyebrow">Your next mission starts here.</p>
+      <h1 data-i18n="Esplora la Luna. Scegli dove atterrare." id="home-title">Explore the Moon. Choose where to land.</h1>
+      <p data-i18n="Confronta luoghi e date sulla Luna per capire quando avrai luce solare e visibilità della Terra." class="home-lead">Compare lunar sites and dates to understand when sunlight and Earth visibility are available.</p>
+        <div class="home-actions">
+      <a class="btn primary" href="#explorer">
+      <span data-i18n="Esplora la Luna">Explore the Moon</span> <span aria-hidden="true">↗</span>
+      </a>
+      <a class="btn" href="#planning">
+      <span data-i18n="Pianifica una missione">Plan a mission</span>
+      </a>
+      </div>
+        <a class="home-guide-link" href="#home-guide">
+      <span data-i18n="Guida rapida">Quick guide</span> ↓</a>
+      </div>
+      <div class="home-orbit" aria-hidden="true">
+      <div class="home-orbit-line">
+      </div>
+      <div class="home-moon">
+      </div>
+      <span class="home-coord">Lunar Eye / 01</span>
+      </div>
+    </section>
+    <section class="home-paths" aria-labelledby="home-paths-title">
+      <h2 data-i18n="Dalla curiosità alla pianificazione" id="home-paths-title">From exploration to planning</h2>
+      <div class="home-path-grid">
+      <a class="home-path" href="#explorer">
+      <small data-i18n="01 / ESPLORA">01 / EXPLORE</small>
+      <h3 data-i18n="Un luogo sulla Luna">A place on the Moon</h3>
+      <p data-i18n="Ruota il globo, visita i siti delle missioni e scegli un punto sulla superficie.">Rotate the globe, visit mission landing sites and choose a point on the surface.</p>
+      <span class="home-path-arrow" aria-hidden="true">↗</span>
+      </a>
+      <a class="home-path" href="#planning">
+      <small data-i18n="02 / PIANIFICA">02 / PLAN</small>
+      <h3 data-i18n="Il momento giusto">The right time</h3>
+      <p data-i18n="Imposta date e pannelli solari. Leggi Sole, Terra e potenza sulla timeline.">Set dates and solar panels. Follow the Sun, Earth and power on the timeline.</p>
+      <span class="home-path-arrow" aria-hidden="true">↗</span>
+      </a>
+      <a class="home-path" href="#compare">
+      <small data-i18n="03 / CONFRONTA">03 / COMPARE</small>
+      <h3 data-i18n="Le alternative">The alternatives</h3>
+      <p data-i18n="Confronta più siti con gli stessi criteri e scopri come cambiano le condizioni.">Compare sites using the same criteria and see how conditions change.</p>
+      <span class="home-path-arrow" aria-hidden="true">↗</span>
+      </a>
+      </div>
+      </section>
+    <section class="home-guide" id="home-guide">
+      <a class="btn primary" id="start-tour" href="#explorer" data-i18n="Avvia tutorial interattivo">Start interactive tutorial</a>
+      <details>
+      <summary>
+      <span data-i18n="Come fare la prima prova">Your first walkthrough</span>
+      </summary>
+      <ol>
+      <li data-i18n="Scegli un sito in Lunar Explorer oppure usa uno dei siti salvati in Pianificazione.">Choose a site in Lunar Explorer or use a saved site in Planning.</li>
+      <li data-i18n="Imposta la data di arrivo, la durata e le caratteristiche dei pannelli solari.">Set the arrival date, duration and solar panel configuration.</li>
+      <li data-i18n="Premi Calcola geometria: il calcolo parte solo quando lo richiedi.">Select Calculate geometry: calculations run only when you request them.</li>
+      <li data-i18n="Leggi gli indicatori di Sole, Terra e potenza; apri i dettagli per fonti e limiti.">Read the Sun, Earth and power indicators; open the details for sources and limitations.</li>
+      <li data-i18n="Usa Play in testata o sposta la timeline per esplorare il periodo calcolato.">Use Play in the top bar or move the timeline to explore the calculated period.</li>
+      </ol>
+      <a class="btn" href="#planning">
+      <span data-i18n="Apri Pianificazione">Open Planning</span> →</a>
+      </details>
+      </section>
+    <footer class="home-footer">
+      <div>
+      <h2 data-i18n="Dati e limiti">Data and limitations</h2>
+      <p data-i18n="Effemeridi NASA/JPL Horizons · Rilievo lunare NASA LRO LOLA.">NASA/JPL Horizons ephemerides · NASA LRO LOLA lunar terrain.</p>
+      <p data-i18n="Uno strumento esplorativo: le stime dipendono dalla risoluzione del terreno. La visibilità della Terra indica una linea di vista geometrica, non garantisce un collegamento radio.">An exploration tool: estimates depend on terrain resolution. Earth visibility indicates a geometric line of sight and does not guarantee a radio link.</p>
+      </div>
+      <a href="#solar">
+      <span data-i18n="Esplora il Sistema Solare">Explore the Solar System</span> ↗</a>
+      </footer>
+  </main>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-head">
+      <div class="brand"><svg viewBox="0 0 32 32" width="28" height="28"><circle cx="16" cy="16" r="9" fill="none" stroke="currentColor" stroke-width="1.6"/><ellipse cx="16" cy="16" rx="15" ry="5" fill="none" stroke="currentColor" stroke-width="1" transform="rotate(-20 16 16)"/><circle cx="28" cy="11" r="2" fill="currentColor"/></svg><div><b>Lunar Eye</b><span>MISSION PLANNER</span></div></div>
+    </div>
+    <a class="app-home-link" href="./" data-i18n-title="Torna alla home" title="Back to home"><span aria-hidden="true">⌂</span><span data-i18n="Torna alla home">Back to home</span></a>
+    <nav>
+      <button data-page="solar" class="active"><i>01</i><span data-i18n="Sistema Solare">Solar System</span></button>
+      <button data-page="explorer"><i>02</i><span>Lunar Explorer</span></button>
+      <button data-page="planning"><i>03</i><span data-i18n="Pianificazione">Planning</span></button>
+      <button data-page="compare"><i>04</i><span data-i18n="Confronto siti">Site comparison</span></button>
+      <button data-page="analysis"><i>05</i><span data-i18n="Analisi missione">Mission analysis</span></button>
+      <button data-page="education"><i>06</i><span data-i18n="Centro didattico">Learning centre</span></button>
+    </nav>
+    <div class="side-foot">
+      <div class="site-chip" id="site-chip"></div>
+      <div class="legend">
+        <span class="badge b-real"><span data-i18n="reale">real</span></span><span class="badge b-interpolated"><span data-i18n="interpolato">interpolated</span></span>
+        <span class="badge b-approximate"><span data-i18n="approssimato">approximate</span></span><span class="badge b-illustrative"><span data-i18n="illustrativo">illustrative</span></span>
+      </div>
+      <small><span data-i18n="Effemeridi: NASA/JPL Horizons · Terreno: NASA LRO LOLA">Ephemerides: NASA/JPL Horizons · Terrain: NASA LRO LOLA</span></small>
+    </div>
+  </aside>
+
+  <header class="timebar">
+    <div class="time-controls">
+      <button class="btn" id="sidebar-toggle" type="button" aria-controls="sidebar" aria-expanded="true" aria-label="Collapse menu">«</button>
+    <div class="tb-group">
+      <label>UTC</label>
+      <input type="datetime-local" id="t-input" step="60">
+    </div>
+    <div class="tb-group">
+      <button id="t-back-d" data-i18n-title="−1 giorno" title="−1 day">−1d</button>
+      <button id="t-back-h" data-i18n-title="−1 ora" title="−1 hour">−1h</button>
+      <button id="t-play" class="primary" data-i18n-title="Play/Pausa" title="Play/Pause">▶</button>
+      <button id="t-fwd-h" data-i18n-title="+1 ora" title="+1 hour">+1h</button>
+      <button id="t-fwd-d" data-i18n-title="+1 giorno" title="+1 day">+1d</button>
+      <button id="t-now"><span data-i18n="Adesso">Now</span></button>
+    </div>
+    <div class="tb-group">
+      <label><span data-i18n="Velocità">Speed</span></label>
+      <select id="t-speed">
+        <option value="1" data-i18n="tempo reale">real time</option><option value="60">1 min/s</option><option value="3600" selected>1 h/s</option>
+        <option value="86400" data-i18n="1 giorno/s">1 day/s</option><option value="604800" data-i18n="1 sett/s">1 week/s</option><option value="2592000" data-i18n="30 giorni/s">30 days/s</option>
+        <option value="31557600" data-i18n="1 anno/s">1 year/s</option><option value="-86400" data-i18n="−1 giorno/s">−1 day/s</option>
+      </select>
+    </div>
+    </div>
+      <div class="language-switch" id="language" role="group" data-i18n-label="Lingua" aria-label="Language">
+        <button type="button" data-language="it" lang="it" aria-label="Italiano" title="Italiano" aria-pressed="false">IT</button>
+        <button type="button" data-language="en" lang="en" aria-label="English" title="English" aria-pressed="true">EN</button>
+      </div>
+    <div class="tb-status" id="t-status"></div>
+  </header>
+
+  <main id="app-main">
+    <section class="page active" id="page-solar"></section>
+    <section class="page" id="page-explorer"></section>
+    <section class="page" id="page-planning"></section>
+    <section class="page" id="page-compare"></section>
+    <section class="page" id="page-analysis"></section>
+    <section class="page" id="page-education"></section>
+  </main>
+  <script type="module" src="js/entry.js"></script>
+</body>
+</html>

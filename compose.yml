@@ -1,0 +1,28 @@
+services:
+  lunar:
+    build: .
+    image: lunar-eye:local
+    restart: "on-failure:3"
+    ports:
+      - "127.0.0.1:${LUNAR_PORT:-8765}:8000"   # solo locale: l'esposizione passa dal reverse proxy
+    mem_limit: 512m
+    memswap_limit: 512m
+    cpus: 1
+    pids_limit: 200
+    read_only: true
+    tmpfs: ["/tmp:size=64m,mode=1777"]
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    volumes:
+      - lunar_raw:/app/data/raw
+      - lunar_cache:/app/data/cache
+      - lunar_tex:/app/frontend/textures
+volumes:
+  lunar_raw:
+  lunar_cache:
+  lunar_tex:

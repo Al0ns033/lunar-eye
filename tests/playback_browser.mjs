@@ -1,0 +1,72 @@
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import {tmpdir} from 'node:os';
+const {chromium}=await import(process.env.PLAYWRIGHT_MODULE || 'playwright');
+const browser=await chromium.launch({headless:true,...(process.env.PLAYWRIGHT_EXECUTABLE ? {executablePath:process.env.PLAYWRIGHT_EXECUTABLE} : {})});
+const page=await browser.newPage({viewport:{width:1440,height:1000}});
+const dir=await fs.mkdtemp(path.join(tmpdir(),'lmp-playback-'));
+const errors=[];page.on('pageerror',e=>errors.push(e.message));
+let apiRequests=0;page.on('request',r=>{if(r.url().includes('/api/'))apiRequests++;});
+try {
+ await page.goto((process.env.LMP_URL || 'http://127.0.0.1:8765')+'/#planning');
+ await page.waitForSelector('#pl-run');await page.waitForSelector('#loading.done',{state:'attached'});
+ if(!await page.locator('#t-play').isDisabled())throw Error('Planning can play before calculation');
+ await page.selectOption('#pl-site','1');await page.fill('#pl-start','2026-12-01T00:00');await page.fill('#pl-days','14');await page.click('#pl-run');
+ await page.waitForFunction(async()=>Boolean((await import('/js/state.js')).state.analysis),null,{timeout:120000});
+ await page.evaluate(async()=>{
+  const {SkyView}=await import('/js/render/skyView.js');const original=SkyView.prototype.render;
+  SkyView.prototype.render=function(){window.testSky=this;return original.call(this);};
+  const {on}=await import('/js/state.js');window.notifications=0;on('time',()=>window.notifications++);
+ });
+ await page.waitForFunction(()=>Boolean(window.testSky));
+ const requestsBefore=apiRequests;
+ const immediate=await page.evaluate(async()=>{
+  const {state}=await import('/js/state.js');
+  const global=document.querySelector('#t-play');const results=[];
+  if(document.querySelector('#pl-play'))throw Error('Duplicate playback control');
+  for(let i=0;i<8;i++){global.click();results.push({global:global.textContent,pressed:global.getAttribute('aria-pressed'),disabled:global.disabled,playing:state.playing});}
+  return results;
+ });
+ console.log('immediate',JSON.stringify(immediate),'errors',JSON.stringify(errors));
+ if(immediate.some((r,i)=>r.global!==(i%2===0?'❚❚':'▶') || r.pressed!==String(i%2===0)))throw Error('Header playback state incorrect');
+ await page.selectOption('#t-speed','86400');
+ await page.click('#t-play');
+ const before=await page.evaluate(()=>({time:performance.now(),notifications:window.notifications,draws:window.testSky.drawCount}));
+ await page.waitForTimeout(2000);
+ await page.click('#t-play');
+ const playing=await page.evaluate(b=>({elapsedMs:performance.now()-b.time,notifications:window.notifications-b.notifications,draws:window.testSky.drawCount-b.draws}),before);
+ if(playing.notifications>Math.ceil(playing.elapsedMs/250)+2)throw Error('Time notifications exceed budget');
+ await page.waitForTimeout(600);
+ const pausedStart=await page.evaluate(()=>({draws:window.testSky.drawCount,timeMs:Date.now()}));
+ await page.waitForTimeout(2000);
+ const paused=await page.evaluate(b=>({draws:window.testSky.drawCount-b.draws,elapsedMs:Date.now()-b.timeMs}),pausedStart);
+ if(paused.draws>1)throw Error('Paused sky keeps drawing');
+ await page.evaluate(async()=>{const {state,setTime}=await import('/js/state.js');setTime(Date.parse(state.analysis.t.at(-1))-1000);});
+ await page.selectOption('#t-speed','31557600');await page.click('#t-play');
+ await page.waitForFunction(async()=>!(await import('/js/state.js')).state.playing);
+ const boundary=await page.evaluate(async()=>{const {state}=await import('/js/state.js');return state.timeMs===Date.parse(state.analysis.t.at(-1));});
+ if(!boundary)throw Error('Playback did not stop at final sample');
+ // Zoom/target recovery and label text separation without moving scientific positions.
+ await page.evaluate(()=>{window.testSky.camera.position.set(0,300,400);window.testSky.controls.target.set(5,5,5);});
+ await page.click('#pl-reset');
+ const reset=await page.evaluate(()=>({target:window.testSky.controls.target.length(),distance:window.testSky.camera.position.length(),sunCenter:window.testSky.sunLabel.center.y,earthCenter:window.testSky.earthLabel.center.y}));
+ if(reset.target>0.01 || reset.distance>150 || reset.sunCenter===reset.earthCenter)throw Error('Reset or label separation failed');
+ if(apiRequests!==requestsBefore)throw Error('Playback or reset triggered API calls');
+ await page.locator('#sidebar-toggle').click();
+ if(!await page.locator('.timebar #sidebar-toggle').count())throw Error('Sidebar toggle outside toolbar');
+ if(await page.locator('#sidebar-toggle').getAttribute('aria-expanded')==='false')await page.locator('#sidebar-toggle').click();
+ if(await page.locator('.side-foot').evaluate(e=>getComputedStyle(e).display)!=='flex')throw Error('Sidebar footer spacing lost');
+ await page.locator('#sidebar-toggle').click();
+ await page.locator('nav [data-page="explorer"]').hover();
+ await page.waitForSelector('#nav-tooltip:not([hidden])');
+ if(await page.locator('#nav-tooltip').textContent()!==await page.locator('nav [data-page="explorer"]').getAttribute('aria-label'))throw Error('Navigation tooltip label incorrect');
+ await page.keyboard.press('Escape');
+ if(await page.locator('#nav-tooltip').isVisible())throw Error('Tooltip did not dismiss');
+ await page.locator('nav [data-page="planning"]').focus();
+ await page.waitForSelector('#nav-tooltip:not([hidden])');
+ await page.locator('#sidebar-toggle').click();
+ await page.screenshot({path:path.join(dir,'planning.png')});
+ const report={dir,errors,immediate,playing,paused,boundary,reset,playbackApiRequests:apiRequests-requestsBefore};
+ await fs.writeFile(path.join(dir,'report.json'),JSON.stringify(report,null,2));console.log(JSON.stringify(report));
+ if(errors.length)throw Error(errors.join('\n'));
+} finally {await browser.close();}

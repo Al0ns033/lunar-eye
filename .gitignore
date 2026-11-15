@@ -1,0 +1,6 @@
+.venv/
+__pycache__/
+data/raw/
+data/cache/
+frontend/textures/
+.DS_Store
